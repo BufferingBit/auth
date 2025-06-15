@@ -4,7 +4,7 @@
 	import { Auth } from "@supabase/auth-ui-svelte"
 	import { ThemeSupa } from "@supabase/auth-ui-shared"
 	import type { SupabaseClient } from '@supabase/supabase-js';
-	import { goto } from "$app/navigation";
+	import { goto, invalidateAll } from "$app/navigation";
 
 	let { supabase, session } = data;
 	$: ({ supabase, session} = data)
@@ -12,6 +12,16 @@
 	$: if(session){
 		goto("/");
 	}
+
+	supabase.auth.onAuthStateChange(async (event, session) => {
+		if(event == 'SIGNED_IN'){
+			invalidateAll();
+		}
+		if(event == "SIGNED_OUT"){
+			await goto("/login-01");
+			invalidateAll();
+		}
+	});
 </script>
 
 <!-- <div class="flex h-screen w-full items-center justify-center px-4">
